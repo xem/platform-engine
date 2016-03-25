@@ -1,0 +1,35 @@
+<!doctype html>
+<meta charset=utf-8>
+<style>
+* { margin: 0; padding: 0; border: 0; box-sizing: border-box; overflow: hidden }
+body { background: #222; text-align: center; }
+img.preload { position: absolute; opacity: 0; left: -9999px; }
+canvas { width: 177.7vh; height: 99vh; background: #eee; cursor: crosshair; }
+canvas.portrait { width: 99vw; height: 56.2vw; position: absolute; top: 50vh; left: 0; margin: -28.1vw 0 0 0.5vw; }
+button { width: 200px; height: 50px }
+</style>
+<title>platform engine</title>
+<body id=body>
+  <canvas id=canvas width=800 height=450></canvas>
+  <button onclick="location=location">reset</button>
+  <input id=l1>
+  <input id=l2>
+  <input id=l3>
+  <img class=preload src="img/hero.png" id=hero_sprite>
+  <img class=preload src="img/wall_unportalable.png" id=wall_unportalable_sprite>
+  <img class=preload src="img/wall_portalable.png" id=wall_portalable_sprite>
+  <img class=preload src="img/gun.png" id=gun_sprite>
+  <img class=preload src="img/void.png" id=void_sprite>
+  <img class=preload src="img/exit.png" id=exit_sprite>
+  <img class=preload src="img/slope45degleft.png" id=slope_45deg_left>
+  <img class=preload src="img/slope45degright.png" id=slope_45deg_right>
+  <img class=preload src="img/slopeminus45degleft.png" id=slope_minus_45deg_left>
+  <img class=preload src="img/slopeminus45degright.png" id=slope_minus_45deg_right>
+  
+  <script src=canvas.js></script>
+  <script src=tiles.js></script>
+  <script src=maps.js></script>
+  <script src=inputs.js></script>
+  <script src=hero.js></script>
+  <script src=game.js></script>
+</body>
