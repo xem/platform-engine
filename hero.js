@@ -46,7 +46,14 @@
 var hero_w = 22;
 var hero_h = 28;
 
-// Unrotated vectors
+// Base vectors (Right and Bottom vectors of length 1)
+// These two vectors get rotated according to the hero's angle
+// then all the other vectors are deduced from them 
+var uright = [1,0];
+var ubottom = [0,1];
+
+// Working vectors
+// These vectors are not used as-is but rotated according to the hero's angle and stored in the hero's properties
 var uL1 = [-11, -14];
 var uC1 = [0, -14];
 var uR1 = [11, -14];
@@ -59,46 +66,69 @@ var uL4 = [-11, 14];
 var uR4 = [11, 14];
 var uL5 = [-7, 14];
 var uR5 = [7, 14];
-var uwalk_speed = [0,0];
-var uwalk_acceleration = [.5,0];
-var uwalk_idle_deceleration = [-.5, 0];
-var umax_walk_speed = [2,0];
-var ujump_speed = [0,-7.4];
-var ujump_fall_speed = [0,0];
-var umax_fall_speed = [0,15];
-var ugravity = [0,.4];
 
-// Base vectors (all the others are computed based on these)
-var uright = [1,0];
-var ubottom = [0,1];
+
+// The names of the base vectors to rotate using maths, and their const equivalent
+base_vectors = {
+  "right": uright,
+  "bottom": ubottom
+}
+  
+// The names of the immportant vectors to rotate using the base vectors, and their const equivalent
+vectors = {
+  "L1": uL1,
+  "C1": uC1,
+  "R1": uR1,
+  "L2": uL2,
+  "R2": uR2,
+  "L3": uL3,
+  "C3": uC3,
+  "R3": uR3,
+  "L4": uL4,
+  "R4": uR4,
+  "L5": uL5,
+  "R5": uR5,
+};
+
 
 // Properties
 var hero = {
-  x: 250, // x position
-  y: 200, // y position
+  x: 250, // x position of C2
+  y: 200, // y position of C2
+  
   angle: 0, // angle in radians (0: head on top)
-  L1: [-11, -14], // Position of L1 from center (C2)
-  C1: [0, -14],
-  R1: [11, -14],
-  L2: [-11, 0],
-  R2: [11, 0],
-  L3: [-11, 10],
-  C3: [0, 14],
-  R3: [11, 10],
-  L4: [-11, 14],
-  R4: [11, 14],
-  L5: [-7, 14],
-  R5: [7, 14],
-  walk_speed: [0,0], // current walk (horizontal) speed
-  walk_acceleration: [.5,0], // walk acceleration (on the right)
-  walk_idle_deceleration: [-.5, 0], // deceleration (after stopping to walk on the right)
-  max_walk_speed: [2,0], // max walk speed (on the right)
-  jump_speed: [0,-7.4], // jump speed when the hump starts
-  jump_fall_speed: [0,0], // current jump/fall (vertical) speed
-  max_fall_speed: [0,15], // max fall speed
-  gravity: [0,.4], // gravity acceleration (bottom)
-  right: [1,0], // Normalized vector to the "right"
-  bottom: [0,1], // and "bottom"
+  
+  // Vectors (rotated with the hero)
+  right: [], // Normalized vector to the "right" (relative to the hero)
+  bottom: [], // and "bottom"
+  
+  L1: [], // Position of L1 from center (C2)
+  C1: [], // etc
+  R1: [],
+  L2: [],
+  R2: [],
+  L3: [],
+  C3: [],
+  R3: [],
+  L4: [],
+  R4: [],
+  L5: [],
+  R5: [],
+
+  // Speeds and accelerations:
+  // Constant
+  max_walk_speed: 5,
+  walk_acceleration: 0.3,
+  walk_idle_deceleration: -.6,
+  jump_speed: -7.4,
+  gravity: 2,
+  
+  // Variable
+  walk_speed: 0,
+  jump_fall_speed: 0,
+  max_fall_speed: 0,
+  
+  // State
   freefall: true // freefall
 };
 
@@ -107,36 +137,6 @@ var rotate_hero = function(angle_deg){
   
   // Convert in radians
   hero.angle = angle_deg * Math.PI / 180;
-  
-  // The names of the base vectors to rotate using maths, and their const equivalent
-  var base_vectors = {
-    "right": uright,
-    "bottom": ubottom
-  }
-  
-  // The names of the immportant vectors to rotate using the base vectors, and their const equivalent
-  var vectors = {
-    "L1": uL1,
-    "C1": uC1,
-    "R1": uR1,
-    "L2": uL2,
-    "R2": uR2,
-    "L3": uL3,
-    "C3": uC3,
-    "R3": uR3,
-    "L4": uL4,
-    "R4": uR4,
-    "L5": uL5,
-    "R5": uR5,
-    "walk_speed": uwalk_speed,
-    "walk_acceleration": uwalk_acceleration,
-    "walk_idle_deceleration": uwalk_idle_deceleration,
-    "max_walk_speed": umax_walk_speed,
-    "jump_speed": ujump_speed,
-    "jump_fall_speed": ujump_fall_speed,
-    "max_fall_speed": umax_fall_speed,
-    "gravity": ugravity
-  };
   
   // Rotate base vectors
   for(var i in base_vectors){
@@ -152,80 +152,62 @@ var rotate_hero = function(angle_deg){
       vectors[i][0] * hero.right[0] + vectors[i][1] * hero.bottom[0],
       vectors[i][0] * hero.right[1] + vectors[i][1] * hero.bottom[1]
     ];
-    
-    ctx.fillStyle = "red";
-    ctx.fillRect(hero.x + hero[i][0]-2, hero.y + hero[i][1]-2,4,4);
-    
-    // Right: 0,1 ok
-    // Bottom: -1,0 ok
-    // uL1: -11, -14 ok
-    // L1 = -11*0-14*-1, -11*1-14*0
-    //    = 14, -11
   }
-  
-  //console.log(hero.right, hero.bottom, hero.L1);
-  
 }
 
 // Hero moves (left / right / jump / fall)
 var move_hero = function(){
     
   // Walk left:
-  if(keys.left){
+  if(keys.left && !keys.right){
     
     // Apply a negative walk acceleration to the hero's speed
-    hero.walk_speed[0] -= hero.walk_acceleration[0];
-    hero.walk_speed[1] -= hero.walk_acceleration[1];
+    hero.walk_speed -= hero.walk_acceleration;
     
     // Limit the hero's speed
-    if(Math.abs(hero.walk_speed[0]) > Math.abs(hero.max_walk_speed[0]) && Math.abs(hero.walk_speed[1]) > Math.abs(hero.max_walk_speed[1])){
-      hero.walk_speed[0] = -hero.max_walk_speed[0];
-      hero.walk_speed[1] = -hero.max_walk_speed[1];
+    if(hero.walk_speed < -hero.max_walk_speed){
+      hero.walk_speed = -hero.max_walk_speed;
     }
-    
-    hero.x += hero.walk_speed[0];
-    hero.y += hero.walk_speed[1];
     
   }
   
   // Walk right:
-  else if(keys.right){
+  else if(keys.right && !keys.left){
     
     // Apply a negative walk acceleration to the hero's speed
-    hero.walk_speed[0] += hero.walk_acceleration[0];
-    hero.walk_speed[1] += hero.walk_acceleration[1];
+    hero.walk_speed += hero.walk_acceleration;
     
     
     // Limit the hero's speed
-    if(Math.abs(hero.walk_speed[0]) > Math.abs(hero.max_walk_speed[0]) && Math.abs(hero.walk_speed[1]) > Math.abs(hero.max_walk_speed[1])){
-      hero.walk_speed[0] = hero.max_walk_speed[0];
-      hero.walk_speed[1] = hero.max_walk_speed[1];
+    if(hero.walk_speed > hero.max_walk_speed){
+      hero.walk_speed = hero.max_walk_speed;
     }
-    
-      hero.x += hero.walk_speed[0];
-      hero.y += hero.walk_speed[1];
     
   }
   
   // Idle:
   
   else{
-    hero.walk_speed = [0,0];
-  }
-  /*else {
     
-    // If the hero stops walking, decelerate
-    if(hero.walk_speed[0] > 0 || hero.walk_speed[1] > 0){
-      hero.walk_speed[0] += hero.walk_idle_deceleration[0];
-      hero.walk_speed[1] += hero.walk_idle_deceleration[1];
+    if(Math.abs(hero.walk_speed) < 1){
+      hero.walk_speed = 0;
     }
-    else if(hero.walk_speed[0] < 0 || hero.walk_speed[1] < 0){
-      hero.walk_speed[0] -= hero.walk_idle_deceleration[0];
-      hero.walk_speed[1] -= hero.walk_idle_deceleration[1];
+    
+    else{
+      
+      // If the hero stops walking, decelerate
+      if(hero.walk_speed > 0){
+        hero.walk_speed += hero.walk_idle_deceleration;
+      }
+      else if(hero.walk_speed < 0){
+        hero.walk_speed -= hero.walk_idle_deceleration;
+      }
     }
-  }*/
+  }
   
   // Move really (update x and y)
+  hero.x += hero.right[0] * hero.walk_speed;
+  hero.y += hero.right[1] * hero.walk_speed;
 
   
   // Stuck on the left:

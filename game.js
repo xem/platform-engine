@@ -1,13 +1,13 @@
 /* Game loop */
 
-zzz = l1.value = 00;//Math.random()*360;
+zzz = l1.value = Math.floor(Math.random()*8) * 45;
 rotate_hero(zzz);
 
 var game = function(){
   
 
   //zzz+=1;
-  rotate_hero(zzz);
+  //rotate_hero(zzz);
   
   // Make the hero move, walk, jump, fall...
   move_hero();
@@ -29,9 +29,13 @@ var game = function(){
   ctx.rotate(hero.angle);
   ctx.drawImage(hero_sprite, -16, -16, tile_w, tile_h);
   ctx.restore();
-  rotate_hero(zzz);
   
-
+  // Debug
+  for(var i in vectors){
+    ctx.fillStyle = "red";
+    ctx.fillRect(hero.x + hero[i][0]-1, hero.y + hero[i][1]-1,2,2);
+  }
+  
   // Next frame
   requestAnimationFrame(game);
 };
