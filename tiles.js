@@ -1,15 +1,15 @@
 /* Tiles */
 
 // Size
-var tile_w = 32;
-var tile_h = 32;
+tile_w = 32;
+tile_h = 32;
 
 
 // Sprites / tileset
 // Solid => 0: non-solid, 1: solid, 2: other (slope)
 // Solidity(x,y) => tells if a pixel is solid in a given tile
 
-var tiles = {
+tiles = {
   
   // 0: void
   "0": {
@@ -62,7 +62,7 @@ var tiles = {
 
 
 // Check if a coordinate (x:y) is on a solid pixel or not
-var is_solid = function(x,y){
+is_solid = function(x,y){
   
   var tile_y = Math.floor(y / tile_h);
 
@@ -78,12 +78,12 @@ var is_solid = function(x,y){
   }
   
   // Return false if the tile is not solid
-  if(maps[current_map][tile_y][tile_x].solid === 0){
+  if(tiles[maps[current_map][tile_y][tile_x]].solid === 0){
     return false;
   }
   
   // Return true if the tile is solid
-  if(maps[current_map][tile_y][tile_x].solid === 1){
+  if(tiles[maps[current_map][tile_y][tile_x]].solid === 1){
     return true;
   }
   

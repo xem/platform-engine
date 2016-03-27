@@ -1,10 +1,6 @@
 /* Game loop */
 
-zzz = l1.value = Math.floor(Math.random()*8) * 45;
-rotate_hero(zzz);
-
-var game = function(){
-  
+game = function(){
 
   //zzz+=1;
   //rotate_hero(zzz);
@@ -40,4 +36,8 @@ var game = function(){
   requestAnimationFrame(game);
 };
 
-onload = game();
+onload = function(){
+  zzz = Math.floor(Math.random()*8) * 45;
+  rotate_hero(zzz);
+  game();
+}

@@ -206,9 +206,47 @@ var move_hero = function(){
   }
   
   // Move really (update x and y)
-  hero.x += hero.right[0] * hero.walk_speed;
-  hero.y += hero.right[1] * hero.walk_speed;
-
+  for(var i = 0; i < Math.abs(hero.walk_speed); i++){
+    hero.x += hero.right[0] * Math.sign(hero.walk_speed);
+    hero.y += hero.right[1] * Math.sign(hero.walk_speed);
+    
+    //l1.value = hero.x + hero.R1[0];
+    //l2.value = hero.y + hero.R1[1];
+    // Detect collision on the right (R1,R2,R4)
+    if(
+      (hero.walk_speed > 0 && 
+        (
+          is_solid(hero.x + hero.R1[0], hero.y + hero.R1[1])
+          ||
+          is_solid(hero.x + hero.R2[0], hero.y + hero.R2[1])
+          ||
+          is_solid(hero.x + hero.R3[0], hero.y + hero.R3[1])
+        )
+      )
+    ){
+      hero.walk_speed = 0;
+      hero.x -= hero.right[0];
+      hero.y -= hero.right[1];
+      break;
+    }
+    
+    else if(
+      (hero.walk_speed < 0 && 
+        (
+          is_solid(hero.x + hero.L1[0], hero.y + hero.L1[1])
+          ||
+          is_solid(hero.x + hero.L2[0], hero.y + hero.L2[1])
+          ||
+          is_solid(hero.x + hero.L3[0], hero.y + hero.L3[1])
+        )
+      )
+    ){
+      hero.walk_speed = 0;
+      hero.x -= -hero.right[0];
+      hero.y -= -hero.right[1];
+      break;
+    }
+  }
   
   // Stuck on the left:
   

@@ -1,15 +1,12 @@
 /* Inputs */
 
-// Keys
-
-var keys = {
+// Keys pressed
+keys = {
   left: false,
   up: false,
   top: false
 };
 
-
-/* Events */
 
 // Key down / keypress (left, top, right)
 onkeydown = onkeypress = function(e){
@@ -25,7 +22,6 @@ onkeydown = onkeypress = function(e){
       break;
   }
 };
-
 
 // Key up (left, top, right)
 onkeyup = function(e){
