@@ -94,7 +94,7 @@ vectors = {
 // Properties
 var hero = {
   x: 250, // x position of C2
-  y: 200, // y position of C2
+  y: 199, // y position of C2
   
   angle: 0, // angle in radians (0: head on top)
   
@@ -120,13 +120,13 @@ var hero = {
   max_walk_speed: 5,
   walk_acceleration: 0.3,
   walk_idle_deceleration: -.6,
-  jump_speed: -7.4,
-  gravity: 2,
+  jump_speed: -12,
+  gravity: 1,
   
   // Variable
   walk_speed: 0,
-  jump_fall_speed: 0,
-  max_fall_speed: 0,
+  fall_speed: 0,
+  max_fall_speed: 6,
   
   // State
   freefall: true // freefall
@@ -205,13 +205,11 @@ var move_hero = function(){
     }
   }
   
-  // Move really (update x and y)
+  // Move horizontally
   for(var i = 0; i < Math.abs(hero.walk_speed); i++){
     hero.x += hero.right[0] * Math.sign(hero.walk_speed);
     hero.y += hero.right[1] * Math.sign(hero.walk_speed);
     
-    //l1.value = hero.x + hero.R1[0];
-    //l2.value = hero.y + hero.R1[1];
     // Detect collision on the right (R1,R2,R4)
     if(
       (hero.walk_speed > 0 && 
@@ -228,8 +226,13 @@ var move_hero = function(){
       hero.x -= hero.right[0];
       hero.y -= hero.right[1];
       break;
+      
+      // Climb a slope on the right:
+      // Slide if the slope is too strong on the right:
+
     }
     
+    // Detect collision on the left (L1,L2,L4)
     else if(
       (hero.walk_speed < 0 && 
         (
@@ -245,37 +248,71 @@ var move_hero = function(){
       hero.x -= -hero.right[0];
       hero.y -= -hero.right[1];
       break;
+      
+      
+      // Climb a slope on the left:
+      // Slide if the slope is too strong on the left:
+    
     }
   }
-  
-  // Stuck on the left:
-  
-  
-  // Climb a slope on the left:
-  
-  
-  // Slide if the slope is too strong on the left:
-  
-  
-  // Stuck on the right:
-  
-  
-  // Climb a slope on the right:
-  
-  
-  // Slide if the slope is too strong on the right:
-  
-  
+
   // Jump:
-  
+  if(keys.up && !hero.freefall){
+    hero.freefall = true;
+    hero.fall_speed += hero.jump_speed;
+  }
   
   // Freefall:
+  hero.fall_speed += hero.gravity;
   
+  if(hero.fall_speed > hero.max_fall_speed){
+    hero.fall_speed = hero.max_fall_speed;
+  }
   
-  // Stuck on top:
+  l1.value = hero.fall_speed;
   
-  
-  // Stuck on bottom:
+  // Move vertically
+  for(var i = 0; i < Math.abs(hero.fall_speed); i++){
+    hero.x += hero.bottom[0] * Math.sign(hero.fall_speed);
+    hero.y += hero.bottom[1] * Math.sign(hero.fall_speed);
+    
+    // Detect collision on the bottom (L4,C3,R4)
+    if(
+      (hero.fall_speed > 0 && 
+        (
+          is_solid(hero.x + hero.L4[0], hero.y + hero.L4[1])
+          ||
+          is_solid(hero.x + hero.C3[0], hero.y + hero.C3[1])
+          ||
+          is_solid(hero.x + hero.R4[0], hero.y + hero.R4[1])
+        )
+      )
+    ){
+      hero.fall_speed = 0;
+      hero.x -= hero.bottom[0];
+      hero.y -= hero.bottom[1];
+      hero.freefall = false;
+      break;
+    }
+    
+    // Detect collision on the top (L1,C1,R1)
+    else if(
+      (hero.fall_speed < 0 && 
+        (
+          is_solid(hero.x + hero.L1[0], hero.y + hero.L1[1])
+          ||
+          is_solid(hero.x + hero.C1[0], hero.y + hero.C1[1])
+          ||
+          is_solid(hero.x + hero.R1[0], hero.y + hero.R1[1])
+        )
+      )
+    ){
+      hero.fall_speed = 0;
+      hero.x -= -hero.bottom[0];
+      hero.y -= -hero.bottom[1];
+      break;
+    }
+  }
   
   
   
@@ -325,41 +362,41 @@ var move_hero = function(){
   // Jump
   if(keys.up && !hero.freefall){
     hero.freefall = true;
-    hero.jump_fall_speed[1] += hero.jump_speed[1];
+    hero.fall_speed[1] += hero.jump_speed[1];
   }
 
   // Feefall
-  hero.jump_fall_speed[1] += hero.gravity[1];
+  hero.fall_speed[1] += hero.gravity[1];
   
-  if(hero.jump_fall_speed[1] > hero.max_fall_speed[1]){
-    hero.jump_fall_speed[1] = hero.max_fall_speed[1];
+  if(hero.fall_speed[1] > hero.max_fall_speed[1]){
+    hero.fall_speed[1] = hero.max_fall_speed[1];
   }
   
   // Move
-  hero.y += hero.jump_fall_speed[1];
+  hero.y += hero.fall_speed[1];
   hero.freefall = true;
 
   // Stuck on top
-  if(hero.jump_fall_speed[1] <= 0){
+  if(hero.fall_speed[1] <= 0){
     
     if((tiles[topleft()].solid[2] == 1) || (tiles[topright()].solid[2]) == 1){
       hero.y = Math.floor((hero.y - (hero_h / 2)) / tile_h) * tile_h + tile_h + (hero_h / 2);
-      hero.jump_fall_speed[1] = 0;
+      hero.fall_speed[1] = 0;
     }
   }
 
   // Stuck on bottom
-  if(hero.jump_fall_speed[1] >= 0){
+  if(hero.fall_speed[1] >= 0){
 
     if((tiles[bottomleft()].solid[0] == 1) || (tiles[bottomright()].solid[0] == 1)){
       hero.y = Math.floor((hero.y + (hero_h / 2)) / tile_h) * tile_h - (hero_h / 2);
       hero.freefall = false;
-      hero.jump_fall_speed[1] = 0;
+      hero.fall_speed[1] = 0;
     }
   }
   
   // Slope bottom right
-  if(tiles[bottomright()].solid[0] == 2 && hero.jump_fall_speed[1] >= 0){
+  if(tiles[bottomright()].solid[0] == 2 && hero.fall_speed[1] >= 0){
     
     // Projection on the slope
     var tmp = Math.ceil((hero.y + hero_h / 2 - 1) / tile_h) * tile_h - tiles[bottomright()].slope((hero.x + (hero_w / 2)) % tile_w) - (hero_h / 2 - 1);
@@ -370,7 +407,7 @@ var move_hero = function(){
     if(tmp <= hero.y){
       hero.y = tmp;
       hero.freefall = false;
-      hero.jump_fall_speed[1] = 0;
+      hero.fall_speed[1] = 0;
     }
   }*/
 }
