@@ -121,7 +121,7 @@ var hero = {
   walk_acceleration: 0.3,
   walk_idle_deceleration: -1,
   jump_speed: -12,
-  gravity: 1.5,
+  gravity: 1,
   
   // Variable
   walk_speed: 0,
@@ -223,8 +223,8 @@ var move_hero = function(){
         &&
         !is_solid(hero.x + hero.R3[0], hero.y + hero.R3[1])
       ){
-        hero.x += -hero.bottom[0] * 4;
-        hero.y += -hero.bottom[1] * 4;
+        hero.x += -hero.bottom[0] * 3;
+        hero.y += -hero.bottom[1] * 3;
       }
           
       // Slide if the slope is too strong on the right
@@ -245,21 +245,36 @@ var move_hero = function(){
     }
 
     // Detect collision on the left (L1,L2,L3)
-    else if(
-      (hero.walk_speed < 0 && 
-        (
+    else if(hero.walk_speed < 0){ 
+        
+      // Climb a slope on the left (L4 solid but L1, L2 and  L3 not solid)
+      if(is_solid(hero.x + hero.L4[0], hero.y + hero.L4[1])
+        &&
+        !is_solid(hero.x + hero.L1[0], hero.y + hero.L1[1])
+        &&
+        !is_solid(hero.x + hero.L2[0], hero.y + hero.L2[1])
+        &&
+        !is_solid(hero.x + hero.L3[0], hero.y + hero.L3[1])
+      ){
+        hero.x += -hero.bottom[0] * 3;
+        hero.y += -hero.bottom[1] * 3;
+      }
+          
+      // Slide if the slope is too strong on the left
+      
+      // TODO
+      if(
           is_solid(hero.x + hero.L1[0], hero.y + hero.L1[1])
           ||
           is_solid(hero.x + hero.L2[0], hero.y + hero.L2[1])
           ||
           is_solid(hero.x + hero.L3[0], hero.y + hero.L3[1])
-        )
-      )
-    ){
-      hero.walk_speed = 0;
-      hero.x -= -hero.right[0];
-      hero.y -= -hero.right[1];
-      break;
+        ){
+        hero.walk_speed = 0;
+        hero.x -= -hero.right[0];
+        hero.y -= -hero.right[1];
+        break;
+      }
     }
   }
   
