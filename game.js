@@ -37,7 +37,7 @@ game = function(){
 };
 
 onload = function(){
-  zzz = Math.floor(Math.random()*8) * 45;
+  zzz = 0;//Math.floor(Math.random()*8) * 45;
   rotate_hero(zzz);
   game();
 }

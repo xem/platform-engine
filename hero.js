@@ -6,7 +6,7 @@
 * A few other points are placed around the hitbox to simplify the collision tests:
 * L1, C1, R1 (x = 0 / 11 / 21; y = 0)
 * L2, C2, R2 (x = 0 / 11 / 21; y = 14)
-* L3, R3 (x = 0 / 21; y = 24)
+* L3, R3 (x = 0 / 21; y = 20)
 * L4, L5, C3, R5, R4 (x = 0 / 4 / 11 / 16 / 21; y = 24)
 * 
 *               C1
@@ -117,11 +117,11 @@ var hero = {
 
   // Speeds and accelerations:
   // Constant
-  max_walk_speed: 5,
+  max_walk_speed: 3,
   walk_acceleration: 0.3,
-  walk_idle_deceleration: -.6,
+  walk_idle_deceleration: -1,
   jump_speed: -12,
-  gravity: 1,
+  gravity: 1.5,
   
   // Variable
   walk_speed: 0,
@@ -210,29 +210,41 @@ var move_hero = function(){
     hero.x += hero.right[0] * Math.sign(hero.walk_speed);
     hero.y += hero.right[1] * Math.sign(hero.walk_speed);
     
-    // Detect collision on the right (R1,R2,R4)
-    if(
-      (hero.walk_speed > 0 && 
-        (
-          is_solid(hero.x + hero.R1[0], hero.y + hero.R1[1])
-          ||
-          is_solid(hero.x + hero.R2[0], hero.y + hero.R2[1])
-          ||
-          is_solid(hero.x + hero.R3[0], hero.y + hero.R3[1])
-        )
-      )
-    ){
-      hero.walk_speed = 0;
-      hero.x -= hero.right[0];
-      hero.y -= hero.right[1];
-      break;
       
-      // Climb a slope on the right:
-      // Slide if the slope is too strong on the right:
-
-    }
+    // Detect collision on the right (R1,R2,R3)
+    if(hero.walk_speed > 0){
     
-    // Detect collision on the left (L1,L2,L4)
+      // Climb a slope on the right (R4 solid but R1, R2 and  R3 not solid)
+      if(is_solid(hero.x + hero.R4[0], hero.y + hero.R4[1])
+        &&
+        !is_solid(hero.x + hero.R1[0], hero.y + hero.R1[1])
+        &&
+        !is_solid(hero.x + hero.R2[0], hero.y + hero.R2[1])
+        &&
+        !is_solid(hero.x + hero.R3[0], hero.y + hero.R3[1])
+      ){
+        hero.x += -hero.bottom[0] * 4;
+        hero.y += -hero.bottom[1] * 4;
+      }
+          
+      // Slide if the slope is too strong on the right
+      
+      // TODO
+
+      if(is_solid(hero.x + hero.R1[0], hero.y + hero.R1[1])
+        ||
+        is_solid(hero.x + hero.R2[0], hero.y + hero.R2[1])
+        ||
+        is_solid(hero.x + hero.R3[0], hero.y + hero.R3[1])
+      ){
+        hero.walk_speed = 0;
+        hero.x -= hero.right[0];
+        hero.y -= hero.right[1];
+        break;
+      }
+    }
+
+    // Detect collision on the left (L1,L2,L3)
     else if(
       (hero.walk_speed < 0 && 
         (
@@ -248,13 +260,10 @@ var move_hero = function(){
       hero.x -= -hero.right[0];
       hero.y -= -hero.right[1];
       break;
-      
-      
-      // Climb a slope on the left:
-      // Slide if the slope is too strong on the left:
-    
     }
   }
+  
+  
 
   // Jump:
   if(keys.up && !hero.freefall){
