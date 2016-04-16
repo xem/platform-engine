@@ -10,6 +10,13 @@ game = function(){
   
   // Draw the scene
   canvas.width = canvas.width;
+  
+  ctx.fillStyle = "#abc";
+  ctx.fillRect(0,0,40,600);
+  
+  ctx.fillStyle = "#aca";
+  ctx.fillRect(760,0,800,600);
+  
   ctx.fillStyle = "black";
   for(i in maps[0]){
     for(j in maps[0][i]){
@@ -27,9 +34,22 @@ game = function(){
   ctx.restore();
   
   // Debug
-  for(var i in vectors){
+  /*for(var i in vectors){
     ctx.fillStyle = "red";
     ctx.fillRect(hero.x + hero[i][0]-1, hero.y + hero[i][1]-1,2,2);
+  }*/
+  
+  /*for(var j = 0; j < hero_w; j++){
+    ctx.fillStyle = "green";
+    ctx.fillRect(hero.x + hero.L4[0] + j * hero.right[0], hero.y + hero.L4[1] + j * hero.right[1],2,2);
+  }*/
+  
+  if(hero.x > tile_w * 24){
+    rotate_hero(45);
+  }
+  
+  if(hero.x < tile_w * 1){
+    rotate_hero(-45);
   }
   
   // Next frame
