@@ -1,6 +1,21 @@
 /* Game loop */
 
+
+// Constants
+var prev_time = +new Date();
+var time = 0;
+var frametime = 0;
+var normal_frametime = 16;
+var frametime_coef = 0;
+
 game = function(){
+  
+  // Handle framerate
+  time = +new Date();
+  frametime = time - prev_time;
+  prev_time = time;
+  frametime_coef = frametime / normal_frametime;
+  l3.value = frametime_coef;
 
   //zzz+=1;
   //rotate_hero(zzz);

@@ -203,7 +203,7 @@ var move_hero = function(){
   }
   
   // Move horizontally
-  for(var i = 0; i < Math.abs(hero.walk_speed); i++){
+  for(var i = 0; i < Math.abs(hero.walk_speed) * frametime_coef; i++){
     hero.x += hero.right[0] * Math.sign(hero.walk_speed);
     hero.y += hero.right[1] * Math.sign(hero.walk_speed);
 
@@ -249,7 +249,7 @@ var move_hero = function(){
     }
 
     // Detect collision on the left (L1,L2,L3)
-    else if(hero.walk_speed < 0){ 
+    else if(hero.walk_speed < 0){
         
       // Climb a slope on the left (one solid between L4 and L3, but L1 + 3 "up", C1, R1, L2 and L3 not solid)
       if(
@@ -264,7 +264,7 @@ var move_hero = function(){
         !is_solid(hero.x + hero.L3[0], hero.y + hero.L3[1])
       ){
         for(var j = 0; j < 4; j++){
-          if(is_solid(hero.x + hero.R4[0] + -j * hero.bottom[0], hero.y + hero.R4[1] + -j * hero.bottom[1])){
+          if(is_solid(hero.x + hero.L4[0] + -j * hero.bottom[0], hero.y + hero.L4[1] + -j * hero.bottom[1])){
             hero.x += -hero.bottom[0] * 4;
             hero.y += -hero.bottom[1] * 4;
             break;
@@ -308,7 +308,7 @@ var move_hero = function(){
   l1.value = hero.fall_speed;
   
   // Move vertically
-  mv: for(var i = 0; i < Math.abs(hero.fall_speed); i++){
+  mv: for(var i = 0; i < Math.abs(hero.fall_speed) * frametime_coef; i++){
     hero.x += hero.bottom[0] * Math.sign(hero.fall_speed);
     hero.y += hero.bottom[1] * Math.sign(hero.fall_speed);
     
